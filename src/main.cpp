@@ -1,95 +1,121 @@
-#include "polynomial.cpp"
-#include "timer.cpp"
+#include "../inc/polynomial.hpp"
+#include <cassert>
+
+#ifdef TIMETEST
+    #include "../inc/timer.hpp"
+#endif
+
+#ifdef MEMORYTEST
+    #include "../inc/memtrack.hpp"
+#endif
+
 #include <iostream>
 #include <memory>
 #include <fstream>
+#include <filesystem>
 
-#define ALPHABET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-#define VARSIZE 1
-#define UNIQUE_DATA_POINTS 1000
-#define RERUN_AMOUNT 100
-
-double g_memoryAllocs = 0;
-
-void* operator new(size_t size)
+std::vector<std::vector<std::array<double, 2>>> generateValues(int seed, int step, int amount)
 {
-    g_memoryAllocs += static_cast<double>(size)/1000.0;
-    return malloc(size);
-}
-
-std::string genPolynomial(int n, std::string vars, int seed, int max)
-{
+    std::vector<std::vector<std::array<double, 2>>> returnVal;
     srand(seed);
-    std::ostringstream returnVal;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < amount; i++)
     {
-        returnVal << rand() % max;
-        for (const char& c : vars)
+        returnVal.push_back(std::vector<std::array<double, 2>>());
+        for (int j = 0; j < i*step; j++)
         {
-            returnVal << c << "^" << rand() % max;
+            int r1 = rand() + 1;
+            double lead = static_cast<double>(r1)/1000;
+            int r2 = rand() + 1;
+            double exponent = static_cast<double>(r2)/1000;
+
+            returnVal[i].push_back(std::array<double, 2>({lead, exponent}));
         }
-        returnVal << "+";
-    }
-    return returnVal.str().substr(0, returnVal.str().size()-1);
-}
-
-struct InputData
-{
-    int termCount;
-    std::string varCount;
-    InputData(int termCount, std::string varCount) :
-        termCount {termCount},
-        varCount {varCount}
-    {
-
-    }
-};
-
-std::vector<InputData> createInputData(int termIncrement, int startTermCount, int endTermCount)
-{
-    std::vector<InputData> returnVal;
-
-    for (int termAmount = startTermCount; termAmount < endTermCount; termAmount += termIncrement)
-    {
-        std::string vars = ALPHABET;
-        returnVal.push_back(InputData(termAmount, vars.substr(0, VARSIZE)));
     }
     return returnVal;
 }
 
-int main()
+std::vector<Polynomial> generatePolynomials(std::vector<std::vector<std::array<double, 2>>> vals)
 {
-    Polynomial<1> polynomial = Polynomial<1>("x^2 + x + 5"); 
-    Polynomial<1> polynomial1 = Polynomial<1>("x"); 
-    (polynomial1 * polynomial).print();
-    return 1;
-    std::vector<InputData> inputData = createInputData(10, 0, 500);
-    _print(inputData.size());
-    std::fstream file = std::fstream("output.csv");
-    file << "Average Time (ms)," << "Average Memory (kb)," << "Term Count," << "Variable Count" << std::endl;
-
-    for (InputData _inputData : inputData)
+    std::vector<Polynomial> polynomials;
+    for (const auto& terms : vals)
     {
-        std::vector<std::string> stringPoly;
-        for (int i = 0; i < UNIQUE_DATA_POINTS; i++)
-        {
-            stringPoly.push_back(genPolynomial(_inputData.termCount, _inputData.varCount, i, 1000000));
-        }
-        g_memoryAllocs = 0;
-        double totalTime = 0;
-        {
-            Timer t = Timer(totalTime);
-            for (int i = 0; i < RERUN_AMOUNT; i++)
-            {
-                for (const std::string& poly : stringPoly)
-                {
-                    Polynomial<VARSIZE> polynomial = Polynomial<VARSIZE>(poly);
-                }
-            }
-        }
-        double averageTime = totalTime / UNIQUE_DATA_POINTS*RERUN_AMOUNT;
-        double averageMem = g_memoryAllocs / UNIQUE_DATA_POINTS*RERUN_AMOUNT;
-        file << averageTime << "," << averageMem << "," << _inputData.termCount << "," << _inputData.varCount.size() << std::endl;
+        polynomials.push_back(Polynomial(terms));
     }
-    _print("done!");
+    return polynomials;
+}
+
+
+int main(int argc, char** argv)
+{
+#ifdef TEST 
+    std::vector<std::array<double, 2>> a1 = {{1.0, 2.0}, {1.0, 3.0}, {2.0, 1.0}};
+    std::vector<std::array<double, 2>> a2 = {{3.0, 3.0}, {2.0, 2.0}, {1.0, 1.0}};
+    Polynomial p1 = Polynomial(a1);
+    Polynomial p2 = Polynomial(a2);
+    p1.print();
+    p2.print();
+    (p1 + p2).print();
+    (p1 * p2).print();
+    _print(p1.calculate(10.0));
+    _print(p2.calculate(10.0));
+    return 0;
+#endif
+    if (argc < 2)
+    {
+        throw std::runtime_error("Include filename!");
+    }
+    if (std::filesystem::exists(argv[1]))
+    {
+        return 0;
+    }
+    std::ofstream file = std::ofstream(argv[1]);
+    if (!file.is_open())
+    {
+        throw std::runtime_error("File failed to open!");
+    }
+
+#ifdef GENTEST
+    std::vector<std::vector<std::array<double, 2>>> genVals = generateValues(10, 10, 500);
+#elif PROCTEST
+    std::vector<Polynomial> polys = generatePolynomials(generateValues(10, 10, 500));
+#else
+    std::vector<Polynomial> polys1 = generatePolynomials(generateValues(10, 10, 500));
+    std::vector<Polynomial> polys2 = generatePolynomials(generateValues(500, 10, 500));
+#endif
+
+#ifdef TIMETEST
+    double time = 0;
+    file << "Term Amount" << "," << "Time (ms)" << std::endl;
+#elif MEMORYTEST
+    size_t memory = 0;
+    file << "Term Amount" << "," << "Peak Memory (b)" << std::endl;
+#endif
+    srand(10);
+    for (int i = 0; i < 500; i++)
+    {
+        {
+        #ifdef TIMETEST
+            time = 0;
+            Timer t = Timer(time);
+        #elif MEMORYTEST
+            memory = 0;
+            MemTrack m = MemTrack(memory);
+        #endif
+
+        #ifdef GENTEST
+            Polynomial p = Polynomial(genVals[i]);
+        #elif PROCTEST
+            double v = polys[i].calculate(10.0);
+        #elif ADDTEST
+            Polynomial p = polys1[i] + polys2[i];
+        #elif MULTTEST
+            Polynomial p = polys1[i] * polys2[i];
+        #endif
+        }
+        #ifdef TIMETEST
+            file << i*10 << "," << time << std::endl;
+        #elif MEMORYTEST
+            file << i*10 << "," << memory << std::endl;
+        #endif
+    }
 }
