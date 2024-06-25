@@ -93,29 +93,32 @@ int main(int argc, char** argv)
     srand(10);
     for (int i = 0; i < 500; i++)
     {
+        for (int j = 0; j < 50; j++)
         {
-        #ifdef TIMETEST
-            time = 0;
-            Timer t = Timer(time);
-        #elif MEMORYTEST
-            memory = 0;
-            MemTrack m = MemTrack(memory);
-        #endif
+            {
+            #ifdef TIMETEST
+                time = 0;
+                Timer t = Timer(time);
+            #elif MEMORYTEST
+                memory = 0;
+                MemTrack m = MemTrack(memory);
+            #endif
 
-        #ifdef GENTEST
-            Polynomial p = Polynomial(genVals[i]);
-        #elif PROCTEST
-            double v = polys[i].calculate(10.0);
-        #elif ADDTEST
-            Polynomial p = polys1[i] + polys2[i];
-        #elif MULTTEST
-            Polynomial p = polys1[i] * polys2[i];
-        #endif
-        }
+            #ifdef GENTEST
+                Polynomial p = Polynomial(genVals[i]);
+            #elif PROCTEST
+                double v = polys[i].calculate(10.0);
+            #elif ADDTEST
+                Polynomial p = polys1[i] + polys2[i];
+            #elif MULTTEST
+                Polynomial p = polys1[i] * polys2[i];
+            #endif
+            }
         #ifdef TIMETEST
             file << i*10 << "," << time << std::endl;
         #elif MEMORYTEST
             file << i*10 << "," << memory << std::endl;
         #endif
+        }
     }
 }
