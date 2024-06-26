@@ -78,12 +78,12 @@ Polynomial Polynomial::operator+(const Polynomial& other) const
 #ifdef LIST
     Polynomial newPolynomial = Polynomial(std::list<Term>());
     std::unordered_map<double, Term*> exponentToPtr;
-    exponentToPtr.reserve(m_terms.size()+other.m_terms.size());
+    exponentToPtr.reserve(m_terms.size());
 #else
     Polynomial newPolynomial = Polynomial(std::vector<Term>());
-    newPolynomial.m_terms.reserve(m_terms.size()+other.m_terms.size());
+    newPolynomial.m_terms.reserve(m_terms.size());
     std::unordered_map<double, size_t> exponentToIndex;
-    exponentToIndex.reserve(m_terms.size()+other.m_terms.size());
+    exponentToIndex.reserve(m_terms.size());
 #endif
     for (const Term& term : m_terms)
     {
@@ -142,12 +142,12 @@ Polynomial Polynomial::operator*(const Polynomial& other) const
 #ifdef LIST
     Polynomial newPolynomial = Polynomial(std::list<Term>());
     std::unordered_map<double, Term*> exponentToPtr;
-    exponentToPtr.reserve(m_terms.size()*other.m_terms.size());
+    exponentToPtr.reserve(m_terms.size()*2);
 #else
     Polynomial newPolynomial = Polynomial(std::vector<Term>());
-    newPolynomial.m_terms.reserve(m_terms.size()*other.m_terms.size());
+    newPolynomial.m_terms.reserve(m_terms.size()*2);
     std::unordered_map<double, size_t> exponentToIndex;
-    exponentToIndex.reserve(m_terms.size()*other.m_terms.size());
+    exponentToIndex.reserve(m_terms.size()*2);
 #endif
     for (const Term& term : m_terms)
     {

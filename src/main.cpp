@@ -93,7 +93,9 @@ int main(int argc, char** argv)
     srand(10);
     for (int i = 0; i < 500; i++)
     {
-        for (int j = 0; j < 50; j++)
+    #ifndef MEMORYTEST
+        for (int j = 0; j < 5; j++)
+    #endif
         {
             {
             #ifdef TIMETEST

@@ -6,7 +6,7 @@ SRC := ./src/*.cpp
 INC := ./include*.cpp
 
 standard:
-	$(COMPILER) $(CFLAGS) -DTIMETEST -DGENTEST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
+	$(COMPILER) -DTIMETEST -DGENTEST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
 	./runner.exe gen_array_time.csv
 	$(COMPILER) $(CFLAGS) -DTIMETEST -DADDTEST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
 	./runner.exe add_array_time.csv
@@ -15,7 +15,7 @@ standard:
 	$(COMPILER) $(CFLAGS) -DTIMETEST -DPROCTEST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
 	./runner.exe pro_array_time.csv
 
-	$(COMPILER) $(CFLAGS) -DMEMORYTEST -DGENTEST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
+	$(COMPILER) -DMEMORYTEST -DGENTEST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
 	./runner.exe gen_array_mem.csv
 	$(COMPILER) $(CFLAGS) -DMEMORYTEST -DADDTEST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
 	./runner.exe add_array_mem.csv
@@ -25,7 +25,7 @@ standard:
 	./runner.exe pro_array_mem.csv
 
 
-	$(COMPILER) $(CFLAGS) -DTIMETEST -DGENTEST -DLIST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
+	$(COMPILER) -DTIMETEST -DGENTEST -DLIST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
 	./runner.exe gen_list_time.csv
 	$(COMPILER) $(CFLAGS) -DTIMETEST -DADDTEST -DLIST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
 	./runner.exe add_list_time.csv
@@ -34,7 +34,7 @@ standard:
 	$(COMPILER) $(CFLAGS) -DTIMETEST -DPROCTEST -DLIST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
 	./runner.exe pro_list_time.csv
 
-	$(COMPILER) $(CFLAGS) -DMEMORYTEST -DGENTEST -DLIST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
+	$(COMPILER) -DMEMORYTEST -DGENTEST -DLIST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
 	./runner.exe gen_list_mem.csv
 	$(COMPILER) $(CFLAGS) -DMEMORYTEST -DADDTEST -DLIST $(CVERSION) -I $(INC) $(SRC) -o $(EXECUTABLENAME)
 	./runner.exe add_list_mem.csv
